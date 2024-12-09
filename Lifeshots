@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life & Gaming Room</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Benvenuto su Life & Gaming Room</h1>
+        <nav>
+            <a href="/upload.html">Carica una foto/video</a>
+        </nav>
+    </header>
+
+    <div class="gallery">
+        <div class="content-item">
+            <video controls>
+                <source src="video1.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="comments">
+                <textarea placeholder="Aggiungi un commento..."></textarea>
+                <button>Posta commento</button>
+            </div>
+        </div>
+
+        <div class="content-item">
+            <img src="room1.jpg" alt="Gaming Room">
+            <div class="comments">
+                <textarea placeholder="Aggiungi un commento..."></textarea>
+                <button>Posta commento</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Life & Gaming Room</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+}
+
+header {
+    background-color: #4CAF50;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin: 0 15px;
+    font-size: 1.2em;
+}
+
+.gallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 20px;
+}
+
+.content-item {
+    background: white;
+    border-radius: 8px;
+    margin: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    max-width: 300px;
+}
+
+.content-item img, .content-item video {
+    width: 100%;
+    height: auto;
+}
+
+.comments {
+    padding: 10px;
+    background-color: #f9f9f9;
+}
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #4CAF50;
+    color: white;
+}
+document.querySelectorAll('.content-item button').forEach(button => {
+    button.addEventListener('click', function() {
+        const commentText = this.previousElementSibling.value;
+        if (commentText.trim() !== "") {
+            alert("Commento postato: " + commentText);
+            // In real applications, you would save the comment to a database
+        }
+    });
+});
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carica un Contenuto</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Carica il tuo Contenuto</h1>
+        <nav>
+            <a href="/index.html">Home</a>
+        </nav>
+    </header>
+
+    <form id="upload-form" action="/server.js" method="POST" enctype="multipart/form-data">
+        <label for="file-upload">Scegli un file (Foto o Video):</label>
+        <input type="file" id="file-upload" name="file" accept="image/*,video/*" required>
+        
+        <button type="submit">Carica</button>
+    </form>
+
+    <footer>
+        <p>&copy; 2024 Life & Gaming Room</p>
+    </footer>
+</body>
+</html>
+const express = require('express');
+const multer = require('multer');
+const path = require('path');
+const app = express();
+const port = 3000;
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/');
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({ storage: storage });
+
+app.use(express.static('public'));  // Serve file statici come HTML, CSS, JS
+app.use('/uploads', express.static('uploads'));  // Serve i file caricati
+
+app.post('/upload', upload.single('file'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).send('Nessun file caricato.');
+    }
+    res.send('File caricato con successo!');
+});
+
+app.listen(port, () => {
+    console.log(`Server in esecuzione su http://localhost:${port}`);
+});
